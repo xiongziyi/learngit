@@ -1,0 +1,42 @@
+Git的安装
+    用户注册
+    $ git config --global user.name "Your Name"
+    $ git config --global user.email "email@example.com"
+    常用指令
+    $ git init 初始化仓库
+    $ mkdir learngit 创建文件夹learngit
+    $ cd learngit  切换文件learngit
+    $ pwd         显示当前路径
+    $ cat  file.txt   查看file.txt文件
+    $ git add file.txt  将文件提交到缓存区
+    $ git add .    将仓库下的所有文件提交到缓存区
+    $ git commit -m"提交备注"
+    $ git log  c查看提交日志
+    $ git reset --hard HEAD^ 退回到上一个版本
+    $ git reset --hard 1094a 切换到指定版本
+    $ git checkout -- readme.txt 删除工作区的修改
+    $ git  status  查看当前工作状态
+
+
+
+
+
+
+
+
+
+
+ 创建并连接远程仓库
+       第1步：创建SSH Key。在用户主目录下，看看有没有.ssh目录，如果有，再看看这个目录下有没有id_rsa和id_rsa.pub这两个文件，如果已经有了，可直接跳到下一步。如果没
+    有，打开Shell（Windows下打开Git Bash），创建SSH Key：
+        $ssh-keygen -t rsa -C "youremail@example.com"
+       第2步：登陆GitHub，打开“Account settings”，“SSH Keys”页面：
+    然后，点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容：
+       第3步：在github上创建test仓库
+       $ git remote add origin https://github.com/github用户名/test.git
+       $ git push -u origin master  将本地代码推送到远端
+
+
+具体细节参考：https://blog.csdn.net/zamamiro/article/details/70172900
+             https://www.liaoxuefeng.com/wiki/896043488029600/896954117292416
+
