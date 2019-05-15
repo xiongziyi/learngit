@@ -1,0 +1,50 @@
+提前准备工具
+         1.STM32F10x_StdPeriph_Lib_V3.5.0 固件库   下载地址：http://www.openedv.com/posts/list/6054.htm
+         2.MDK5开发环境
+
+创建工程模板
+         1.新建文件夹，取名Template，并在Template文件夹下新建USER文件夹。
+         2.打开MDK，Project->New Uvision Project  新建名为template 工程，点击保存。
+         3.在弹出的一个CPU界面，选择STM32F103ZE型号，单击ok后，弹出的Manage Run -Time Enviroment对话框，点击取消。
+         4.目前USER 有两个文件夹，Listings ，Objects，后缀名为.uvoptx和.uvprojx 文件，在Template 下新建CORE, ,OBJ,STM32F10x_FWLIB文件夹，
+         将STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\STM32F10x_StdPeriph_Driver下的inc和src文件夹复制到STM32F10x_FWLIB文件夹下，
+         将STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\CMSIS\CM3\CoreSupport路径下的core_cm3.c和core_cm3.h文件复制到CORE下，
+         将STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\arm下的startup_stm32f10x_hd.s（此处的文件根据芯片flash大小选择）复制到CORE下。
+         将STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x 下system_stm32f10x.c ，system_stm32f10x.h,stm32f10x.h复制到USER下，
+         将STM32F10x_StdPeriph_Lib_V3.5.0\Project\STM32F10x_StdPeriph_Template下的main.c,stm32f10x.conf.h,stm32f10x_it.c stm32f10x_it.h 复制到USER下
+         5.进入MDK5下，右击target Manage ， Project Items
+         6.将target 换成Template  删除Source  Group1 ,建立三个Groups ，USER,CORE,FWLIB, FWLIB 下，添加STM32F10x_FWlib/src下所有的文件，CORE下，添加core_cm3.c,startup_stm32f10x_md.s文件，USER添加 main.c stm32f10x_it.c , system_stm32f10x.c 文件
+         7.编译工程前 ，点击魔术棒 ，点击Output 选项卡，点击Select folder for objects选择我们新建的OBJ，点击create hex file .
+         8.点击编译，有报错产生
+         9.点击魔术棒，选择C/C++选项卡 ，点击Include Path 将 USER,CORE,STM32_F10X_FWBLIB \inc文件下，将STM32F10X_HD,USE_STDPERIPH_DRIVER输入到define定义下
+         10. 编辑之前 ，将main.c 文件内容替换成如下代码：
+             #include "stm32f10x.h"
+             void Delay(u32 count)
+             {
+	             u32 i = 0;
+	             for (;i<count;i++);
+            }
+            int main(void)
+            {
+	             GPIO_InitTypeDef GPIO_InitStructure;
+	             RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOE,ENABLE);
+	             GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 ;
+		         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP ;
+		         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz ;
+	             GPIO_Init(GPIOB,&GPIO_InitStructure);
+	             GPIO_SetBits(GPIOB,GPIO_Pin_5);
+	             GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+	             GPIO_Init(GPIOE,&GPIO_InitStructure);
+	             PIO_SetBits(GPIOB,GPIO_Pin_5);
+	         while(1)
+	         {
+		         GPIO_ResetBits(GPIOB,GPIO_Pin_5);
+		         GPIO_SetBits(GPIOE,GPIO_Pin_5);
+		         Delay(3000);
+		         GPIO_SetBits(GPIOE,GPIO_Pin_5);
+		         GPIO_ResetBits(GPIOB,GPIO_Pin_5);
+			    Delay(3000);
+	         }
+          }
+更多详细参考：
+https://www.bilibili.com/video/av18399201?from=search&seid=2547731176917351118
