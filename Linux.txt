@@ -1,0 +1,37 @@
+Linux 命令教程：
+      1. ls  -[选项] [参数]
+         ls           显示目录
+         ls -a /etc   显示etc目录下所有的文件，包括隐藏文件
+         ls -l        显示文件的具体参数
+      2. mkdir -[选项] [参数]
+         mkdir  /etc/temp    在已存在的etc目录下创建
+         mkdir -p /etc/temp 递归创建etc下的temp文件，etc不必存在
+         mkdir  /etc/temp/temp1 /etc/temp/temp2 同时创建多个目录
+      3. rmdir -[选项] [参数]
+         rmdir  /etc/temp    删除stc下的空目录temp
+         rm -rf /etc/temp    强行删除temp目录，即使有文件存在
+      4. cd -[选项] [参数]
+         cd ..  返回上一级
+         cd /etc/temp/temp1 切换到指定目录
+      5. cp  cp -[选项] [参数]
+         cp  /etc/temp.sdf /etc/temp1.sdf    /temp  将temp.sdf temp1.sdf 文件复制到temp目录下
+         cp -r  /etc/temp  /home 复制temp目录到home下
+      6. mv mv -[选项] [参数]
+         mv  /etc/temp.sdf /etc/temp1.sdf    /temp  将temp.sdf temp1.sdf 文件移动到temp目录下
+         mv  /etc/temp  /home 复制temp目录到home下
+      7.touch a.py  在当前目录下创建a.py
+        touch  /etc/temp.sdf  在etc目录下创建temp.sdf 文件
+        touch a.py b.py  同时创建两个文件
+      8.cat  /etc/issue
+        cat  -n /etc/services 查看内容，并显示行号
+      9.  ln -s /etc/issue  /temp/issue.soft   生成软连接
+          ln -s /etc/issue  /temp/issue.hard   生成硬连接
+      10. chmod [{ugoa}{+-=}{rwx}][文件或目录][mode=421][文件目录] -R 递归修改
+          chmod u+x  a.asd
+          chmod g+w, o-r  a.asd
+      11. chown [用户][文件或目录]
+          chown  own1   temp  
+      12. chgrp [用户][文件或目录]
+          chgrp   own1   temp
+      13. find  find[范围][搜索条件]
+          find  /etc -name init
