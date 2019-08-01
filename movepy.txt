@@ -1,0 +1,11 @@
+﻿关于moviepy的使用
+    from moviepy.editor import *  #导入包
+    vfc = VideoFileClip(path)# path为输入视频路径
+    vfc.subclip(time_1, time_2)# time_1和time_2为需要剪切视频时长的两个端点，不需要time_1在time_2之前
+    concatente_videoclips(vfc_list, method='compose')# vfc_list为VideoFileClip的对象组成的list
+    vfc.crop(x_center=x_center, y_center=y_center, width=width, height=height)
+    vfc.resize(newsize=(width, height))
+    clip = ImageSequenceClip(pic_list, fps=fps)
+    clip.write_videofile(path, codec='mpeg4', verbose=False, audio=False)
+ os.listdir获取指定路径下单文件名列表
+    
