@@ -1,0 +1,38 @@
+﻿如何创建PCB工程文件及其步骤：
+    1.项目立项  ：	File -> New -> Project -> PCB-Project
+    2.建立元器件库:  File -> New -> Library -> Schematic_Library
+    3.原理图设计:    File -> New  -> Schematic
+    4.PCB元件库:    File -> New -> Library ->PCB_Library
+    5.PCB设计：     File -> New -> PCB 
+
+如何将原理图自动生成元器件库
+     快捷键   D+M  
+原理图层次设计
+      在原理图中  place -> 页面符
+                         desgin -> 从母图生成原理图
+如今解决连接不上元器件的方法：
+  设置栅格(通常设置5的倍数)
+ View -> Grids ->Set snap Grids
+常用快捷键
+      排列命令   
+      A + L 向左对齐
+      A + R 向右对齐
+      A + T 向上对齐
+      A + B 向下对齐
+      A + D 横向等间距
+      A + I 纵向等间距
+      其他快捷键命令  
+      P  + W 放置导线
+      P  + B 放置总线
+      P  + P 放置元件 
+     E +F +C 确认中心点
+整列粘贴
+      E + paste speocial        
+原理图自动编号：
+     tools +标注+原理图编号
+器件位号自动编号
+  Tools  -> Annoation ->Annoation Schemical   点击Update Changes List 点击Accept Changes  点击Execute Changes
+编译原理图
+  Project  -> Project Options  勾选报错选项
+PCB封装添加
+  Tools ->FootprintManager
