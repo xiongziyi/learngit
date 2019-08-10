@@ -1,0 +1,130 @@
+ os.listdir获取指定路径下单文件名列表
+          list = os.listdir("D:/image/")
+#导入模块
+import  cv2 as cv
+import  os
+import  numpy as  np
+list = os.listdir("D:/image/")
+print(list)
+
+
+#显示图片
+img = cv.imread("D:/image/1.jpg")
+cv.imshow("Image", img)
+cv.waitKey(0)#切忌忘掉
+cv.destroyAllWindows()
+
+
+#复制一张图片
+empty =  np.zeros(img.shape,np.uint8)
+empty = img.copy()
+cv.imshow("image2",empty)
+cv.imwrite("D:/image/1_1.jpg",empty,[int(cv.IMWRITE_PNG_COMPRESSION),0])#第三个参数代表压缩等级
+cv.waitKey(0)
+cv.destroyAllWindows()
+
+#获取图片尺寸img
+img.shape
+
+#重新定义图片尺寸并保存
+img = cv.imread("D:/image/1.jpg")
+cv.imshow("Image", img)
+print(img.shape)
+img2 = cv.resize(img,(300,400),interpolation=cv.INTER_CUBIC)
+cv.imwrite("D:/image/1_8.jpg",img2,[int(cv.IMWRITE_PNG_COMPRESSION),0])
+cv.imshow("sb",img2)
+cv.waitKey(0)
+cv.destroyAllWindows()
+
+#识别规定颜色
+import numpy as np
+import cv2
+img=cv2.imread('D:\image\eg.png',cv2.IMREAD_COLOR)
+cv2.imshow('img',img)
+hsv=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)#将图片转换成hsv值
+
+lower_blue=np.array([110,100,100])#blue
+upper_blue=np.array([130,255,255])
+
+lower_green=np.array([50,100,100])#green
+upper_green=np.array([70,255,255])
+
+lower_red=np.array([0,100,100])#red
+upper_red=np.array([10,255,255])
+
+blue_mask=cv2.inRange(hsv,lower_blue,upper_blue)#标定识别范围
+green_mask=cv2.inRange(hsv,lower_green,upper_green)
+red_mask=cv2.inRange(hsv,lower_red,upper_red)
+
+blue=cv2.bitwise_and(img,img,mask=blue_mask)
+cv2.imshow('blue',blue)
+
+green=cv2.bitwise_and(img,img,mask=green_mask)#进行与操作过滤掉其余颜色
+cv2.imshow('green',green)
+
+red=cv2.bitwise_and(img,img,mask=red_mask)
+cv2.imshow('red',red)
+
+res=red+blue+green#组合显示挑选出的色值
+cv2.imshow('res',res)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#读取视频文件
+import cv2
+cap = cv2.VideoCapture('D:/image/video.mp4')
+
+while(cap.isOpened()):
+    ret, frame = cap.read()
+    cv2.imshow('image', frame)
+    k = cv2.waitKey(20)
+    #q键退出
+    if (k & 0xff == ord('q')):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+
+#截取视频中的每张图片
+import  numpy as np
+import  cv2 as cv
+import  time
+cap = cv.VideoCapture('D:/image/video.mp4')
+count = 0
+while(True):
+    ret ,frame = cap.read()
+    gray  = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
+    cv.imshow("frame",gray)
+    empty = np.zeros(gray.shape, np.uint8)
+    empty = gray.copy()
+    filename = ['D:/image/{0}.jpg'.format(i) for i in range(4,16)]
+    cv.imwrite(filename[count], empty, [int(cv.IMWRITE_PNG_COMPRESSION), 0])  # 第三个参数代表压缩等级
+    count = count+1
+    if count==10:
+        break;
+
+cap.release()
+cv.destroyAllWindows()
+
+#读取图像识别模块
+import  numpy as np
+import  cv2 as cv
+cap = cv.VideoCapture(0)
+while(True):
+    ret ,frame = cap.read()
+    gray  = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
+    cv.imshow("frame",gray)
+    if cv.waitKey(1)& 0xFF == ord("q"):
+        break;
+cap.release()
+cv.destroyAllWindows()
+
+
+#PIL模块使用
+import  PIL
+from PIL import Image
+image_file = Image.open("D:/a.jpg") # open colour image
+image_file = image_file.convert('1') # 将图片转换为二进制图片
+image_file.save('D:/a.bmp')
+
