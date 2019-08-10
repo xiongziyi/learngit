@@ -26,7 +26,13 @@
       P  + B 放置总线
       P  + P 放置元件 
      E +F +C 确认中心点
-整列粘贴
+    Ctrl + M 测量两点距离
+    shift + c 清除测量距离
+    P +L PCB布线
+    P+G 铺铜
+    选择交叉编译模式
+Tools  + cross select mode
+阵列粘贴
       E + paste speocial        
 原理图自动编号：
      tools +标注+原理图编号
@@ -36,3 +42,12 @@
   Project  -> Project Options  勾选报错选项
 PCB封装添加
   Tools ->FootprintManager
+解决pcb绿色报错处理
+  点击panels ,点击PCB Rlues and vialations，点击clearance constant ，SMD pad修改尺寸约束
+解决器件移动到板块报绿问题
+ 将右侧棕色部分删除掉
+边框大小定义
+   框选所有元器件  再点击tools  + compentents placement + Arrange within recentangle
+   在机械一层绘制框，按P+l 匡完元器件后，点击边框按tab，点击design + board shape  +defined from selected 
+让设置器件文本定位
+       点击单个文本，右击选择相似文本，选中所有类似文本，设置大小后，框选整个面板框，按快捷键A，选择文本定位器，选择居中显示
