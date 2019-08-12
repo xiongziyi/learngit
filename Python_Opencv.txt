@@ -128,3 +128,8 @@ image_file = Image.open("D:/a.jpg") # open colour image
 image_file = image_file.convert('1') # 将图片转换为二进制图片
 image_file.save('D:/a.bmp')
 
+#新建一张照片
+toImage = Image.new('RGBA', (size,size))
+img = toImage.resize((newsize, newsize), Image.ANTIALIAS)
+img.size#得到一个数组
+img.save（'d:/imag/all.png'）
