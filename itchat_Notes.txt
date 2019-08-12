@@ -1,0 +1,93 @@
+import  itchat
+import xlwt
+import  requests
+import  json
+import  os
+from itchat.content import *
+friend_list = []
+import  time
+def login():
+     itchat.login()
+#获取列表联系人
+def  get_friend_list():
+    friends = itchat.get_friends()[0:]
+    for friend in friends:
+        friend_info = {}
+        friend_info['UserName'] = friend['UserName']
+        friend_info['NickName'] = friend['NickName']
+        friend_info['Sex']     =   '男'if friend['Sex']==1  else '女'
+        friend_info['address'] =  '地址不详'   if  friend['Province'] + friend['City'] == '' else friend['Province'] + friend['City']
+        print(friend_info)
+        friend_list.append(friend_info)
+
+#将联系人写入excel
+def write_to_book():
+    flag =1
+    wb = xlwt.Workbook(encoding='ascii')
+    ws = wb.add_sheet('学员信息表', cell_overwrite_ok=True)
+    for index , content in enumerate(friend_list):
+        titles = list(content.keys())
+        values = list(content.values())
+        if flag == 1:
+            for  index2 ,title in enumerate(titles) :
+               print(index,index2,title)
+               ws.write(index, index2, title)
+               flag =0
+        for index2, value in enumerate(values):
+              print(index, index2,value)
+              ws.write(index+1, index2,value)
+    wb.save('D:\我爱姜婷.xls')
+
+#requests库获取天气信息
+def  get_weathers(address):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36"
+    }
+    url = "http://wthrcdn.etouch.cn/weather_mini?city={0}".format(address)
+    print(url)
+    weather_info = ""
+    weather_infos = {}
+    time.sleep(2)
+    resp = requests.get(url=url, headers=headers).content.decode()
+    resp = json.loads(resp)
+    print(resp)
+    weather_infos['city'] = resp['data']['city']
+    weather_infos['forecast'] = resp['data']['forecast']
+    for date in weather_infos['forecast'] :
+        weather_info = weather_info+date['date'] +date['low']+date['high'] + date['type'] +"\n"
+    return  weather_info
+
+#给联系人发送信息
+def send_message(message,person):
+    # users = itchat.search_friends("褚春荣")
+    # userName = users[0]['UserName']
+    # print(userName)
+    # message = get_weathers()
+    # print(message)
+    itchat.send(message,toUserName=person)
+
+#实时监听好友消息
+@itchat.msg_register([TEXT,MAP,CARD,NOTE,SHARING])
+def  message_recieve(msg):
+    #res = itchat.search_friends(userName=msg['FormUserName'])['NickName']+':'+ msg['Text']
+    isaid = ""
+    address = ""
+    get_friend_list()
+    print(msg)
+    for friend in friend_list:
+        if  friend['UserName'] == msg['FromUserName']:
+            isaid = friend['NickName']
+            address =friend['address'][2:]
+
+    res = isaid + ':'+msg['Content']
+    if  '天气' in res:
+        send_message(get_weathers(address),msg['FromUserName'])
+        
+#监听群聊消息
+@itchat.msg_register(TEXT,isGroupChat=True)
+def Gchat(msg):
+    grap ="group#" + msg["ActualNickName"]+":"+msg['Text']
+    print(grap)
+
+login()
+itchat.run()
