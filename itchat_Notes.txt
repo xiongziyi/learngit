@@ -37,7 +37,25 @@ def write_to_book():
               print(index, index2,value)
               ws.write(index+1, index2,value)
     wb.save('D:\我爱姜婷.xls')
-
+#获取微信好友图片    
+def get_image():
+    get_friend_list()
+    for index,friend in enumerate(friend_list):
+        img =  itchat.get_head_img(userName=friend['UserName'])
+        with open("D:\image\wechat\{0}.jpg".format(index),'wb') as f:
+            f.write(img)
+#将好友图片拼接            
+def Combine_image():
+    toImage = Image.new('RGBA', (954,954 ))
+    paths  = [r'D:\image\wechat\{0}.jpg'.format(i) for i in range(0,81)]
+    num = 0
+    for row in range(9):
+          for col in range(9):
+              image_file = Image.open(paths[num])
+              img = image_file.resize((106, 106), Image.ANTIALIAS)
+              toImage.paste(img,(row*106,col*106))
+              num = num + 1
+    toImage.save(r'D:\image\wechat\all.png')
 #requests库获取天气信息
 def  get_weathers(address):
     headers = {
