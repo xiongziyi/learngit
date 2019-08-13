@@ -3,13 +3,19 @@ import xlwt
 import  requests
 import  json
 import  os
+import  re
+from PIL import  Image
 from itchat.content import *
-friend_list = []
 import  time
+friend_list = []
+days = 0
+#微信登录
 def login():
      itchat.login()
-#获取列表联系人
+
+#获取好友列表
 def  get_friend_list():
+    login()
     friends = itchat.get_friends()[0:]
     for friend in friends:
         friend_info = {}
@@ -20,7 +26,28 @@ def  get_friend_list():
         print(friend_info)
         friend_list.append(friend_info)
 
-#将联系人写入excel
+#获取好友列表头像
+def get_image():
+    get_friend_list()
+    for index,friend in enumerate(friend_list):
+        img =  itchat.get_head_img(userName=friend['UserName'])
+        with open("D:\image\wechat\{0}.jpg".format(index),'wb') as f:
+            f.write(img)
+
+#拼接好友列表头像
+def Combine_image():
+    toImage = Image.new('RGBA', (954,954 ))
+    paths  = [r'D:\image\wechat\{0}.jpg'.format(i) for i in range(0,81)]
+    num = 0
+    for row in range(9):
+          for col in range(9):
+              image_file = Image.open(paths[num])
+              img = image_file.resize((106, 106), Image.ANTIALIAS)
+              toImage.paste(img,(row*106,col*106))
+              num = num + 1
+    toImage.save(r'D:\image\wechat\all.png')
+
+#将好友信息写入excel表中
 def write_to_book():
     flag =1
     wb = xlwt.Workbook(encoding='ascii')
@@ -37,26 +64,8 @@ def write_to_book():
               print(index, index2,value)
               ws.write(index+1, index2,value)
     wb.save('D:\我爱姜婷.xls')
-#获取微信好友图片    
-def get_image():
-    get_friend_list()
-    for index,friend in enumerate(friend_list):
-        img =  itchat.get_head_img(userName=friend['UserName'])
-        with open("D:\image\wechat\{0}.jpg".format(index),'wb') as f:
-            f.write(img)
-#将好友图片拼接            
-def Combine_image():
-    toImage = Image.new('RGBA', (954,954 ))
-    paths  = [r'D:\image\wechat\{0}.jpg'.format(i) for i in range(0,81)]
-    num = 0
-    for row in range(9):
-          for col in range(9):
-              image_file = Image.open(paths[num])
-              img = image_file.resize((106, 106), Image.ANTIALIAS)
-              toImage.paste(img,(row*106,col*106))
-              num = num + 1
-    toImage.save(r'D:\image\wechat\all.png')
-#requests库获取天气信息
+
+#获取天气信息
 def  get_weathers(address):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36"
@@ -65,7 +74,7 @@ def  get_weathers(address):
     print(url)
     weather_info = ""
     weather_infos = {}
-    time.sleep(2)
+    time.sleep(0.5)
     resp = requests.get(url=url, headers=headers).content.decode()
     resp = json.loads(resp)
     print(resp)
@@ -75,16 +84,50 @@ def  get_weathers(address):
         weather_info = weather_info+date['date'] +date['low']+date['high'] + date['type'] +"\n"
     return  weather_info
 
-#给联系人发送信息
+#例假日期提醒
+def period_notice():
+    local_time = time.strftime("%Y-%m-%d", time.localtime())
+    local_month = int(local_time[5:7])
+    local_days = int(local_time[8:])
+    last_time = '2019-07-27'
+    notice_message = '婷婷上次例假时间为{0}，周期为{1}天，未来六次例假时间为\n'.format(last_time,30)
+    url = 'https://anquanqi.51240.com/?riqi={0}&zhouqi={1}'.format(last_time,30)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36"
+    }
+    resp = requests.get(url=url, headers=headers).content.decode()
+    time.sleep(1)
+    results = re.findall(r'<strong><font color="#669900">(.*?)</font></strong>',resp)
+    predict_date= re.findall(r"2019年(.*?)月(.*?)日",results[0])
+    last_month =      int(last_time[6:7]) if  '0' in last_time[5:7] else int(last_time[5:7])
+    last_day = int(last_time[9:]) if  '0' in last_time[8:] else int(last_time[8:])
+    predict_month = int(predict_date[0][0][1])  if  '0' in predict_date[0][0] else int(predict_date[0][0])
+    predict_day =   int(predict_date[0][1][1]) if '0' in predict_date[0][1] else  int(predict_date[0][1])
+    if local_month == predict_month:
+        days =predict_day-local_days+2
+    if  local_month <  predict_month:
+         if local_month in [1,3,5,7,8,10,12]:
+             days = 31-local_days + predict_day +2
+         if local_month in [4,6,9,11]:
+             days = 31 - local_days + predict_day+2
+         if  local_month in [2]:
+             days = 28-local_days +predict_day+2
+
+    for result in results:
+        notice_message = notice_message +result +'\n'
+    notice_message= notice_message +"(预测时间前后偏差两天)" +"下次例假预计还有"+str(days)+"天"
+    return  notice_message
+
+#发送消息
 def send_message(message,person):
     # users = itchat.search_friends("褚春荣")
     # userName = users[0]['UserName']
     # print(userName)
     # message = get_weathers()
-    # print(message)
+    print(message)
     itchat.send(message,toUserName=person)
 
-#实时监听好友消息
+#监听好友消息
 @itchat.msg_register([TEXT,MAP,CARD,NOTE,SHARING])
 def  message_recieve(msg):
     #res = itchat.search_friends(userName=msg['FormUserName'])['NickName']+':'+ msg['Text']
@@ -96,11 +139,14 @@ def  message_recieve(msg):
         if  friend['UserName'] == msg['FromUserName']:
             isaid = friend['NickName']
             address =friend['address'][2:]
-
     res = isaid + ':'+msg['Content']
+    if days <=30:
+        send_message(period_notice(), friend_list[73]['UserName'])
     if  '天气' in res:
         send_message(get_weathers(address),msg['FromUserName'])
-        
+    # if '例假' in res:
+    #     send_message(period_notice(),msg['FromUserName'])
+
 #监听群聊消息
 @itchat.msg_register(TEXT,isGroupChat=True)
 def Gchat(msg):
