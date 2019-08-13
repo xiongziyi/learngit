@@ -1,0 +1,65 @@
+#安装包  pip install pyserial
+#运行python脚本代码时切记不要打开串口助手
+import serial
+import sys
+ser = serial.Serial('COM13', 9600)
+count = 0
+while True :
+    count = count+1
+    if count>10:
+        break
+    s = ser.readline()
+    print(s.decode())
+ser.close()
+
+
+Arduino 一方代码为
+int counter=0; // 计数器
+ 
+void setup() {
+// 初始化串口
+  Serial.begin(9600);
+}
+ 
+void loop() {
+// 每loop循环一次，计数器变量加1
+counter = counter+1;
+// 输出变量
+Serial.print(counter);
+// 输出字符
+Serial.print( ':' );
+// 输出字符串;
+Serial.println("Hellow World");
+delay(1000);
+}
+
+
+/************************************************************************/
+#更多用法
+import serial
+import sys
+try:
+  ser = serial.Serial('COM13', 9600)
+  result = ser.isOpen()
+
+except Exception:
+  print('open serial failed.')
+  exit(1)
+print('串口已打开')
+# while True:
+#
+while result:
+    ser.write("串口参数写入".encode())
+    count = ser.inWaiting()#返回串口缓冲区的字节数
+    print(count)
+    data = ser.read(10)#读10个字符
+    print(data)
+    data = ser.readline()#读一行数据，以 / n结束，要是没有 / n就一直读，阻塞。
+    print(data)
+    ser.baudrate = 9600 #设置波特率
+    print(ser)#可查看当前串口的状态信息
+    ser.isOpen()#当前串口是否已经打开
+    ser.inWaiting()#判断当前接收的数据
+    ser.flushInput()  #清除输入缓冲区数据
+    ser.flushOutput()
+
