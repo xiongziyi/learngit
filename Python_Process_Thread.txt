@@ -1,0 +1,159 @@
+#什么是多线程运行
+     import requests
+from concurrent.futures import ThreadPoolExecutor
+urls_list = [
+  'https://www.baidu.com',
+  'http://www.gaosiedu.com',
+  'https://www.jd.com',
+  'https://www.taobao.com',
+  'https://news.baidu.com',
+]
+pool = ThreadPoolExecutor(3)
+def request(url):
+  response = requests.get(url)
+  return response
+def read_data(future,*args,**kwargs):
+  response = future.result()
+  response.encoding = 'utf-8'
+  print(response.status_code,response.url)
+def main():
+  for url in urls_list:
+    done = pool.submit(request,url)
+    done.add_done_callback(read_data)
+if __name__ == '__main__':
+  main()
+  pool.shutdown(wait=True)
+一般情况下我们启动一个.py文件，就等于启动了一个进程，一个进程里面默认有一个线程工作，我们使用的多线程的意思就是在一个进程里面启用多个线程，多线程适合IO操作
+
+
+#什么是多进程运行
+    import requests
+from concurrent.futures import ProcessPoolExecutor
+urls_list = [
+  'https://www.baidu.com',
+  'http://www.gaosiedu.com',
+  'https://www.jd.com',
+  'https://www.taobao.com',
+  'https://news.baidu.com',
+]
+pool = ProcessPoolExecutor(3)
+def request(url):
+  response = requests.get(url)
+  return response
+def read_data(future,*args,**kwargs):
+  response = future.result()
+  response.encoding = 'utf-8'
+  print(response.status_code,response.url)
+def main():
+  for url in urls_list:
+    done = pool.submit(request,url)
+    done.add_done_callback(read_data)
+if __name__ == '__main__':
+  main()
+  pool.shutdown(wait=True)
+
+ #总结：
+
+1、多线程适合IO密集型程序
+
+2、多进程适合CPU密集运算型程序
+
+
+
+#什么是协程
+   协程：又称微线程纤程。英文名Coroutine。那协程到底是个什么东西，通俗的讲就是比线程还要小的线程，所以才叫微线程。
+   1、使用高并发、高扩展、低性能的；一个CPU支持上万的协程都不是问题。所以很适合用于高并发处理。
+   2、无需线程的上下文切换开销（乍一看，什么意思呢？我们都知道python实际上是就是单线程，那都是怎么实现高并发操作呢，就是CPU高速的切换，每个任务都干一点，最后看上去是一起完事儿的，肉眼感觉就是多线程、多进程）
+安装
+pip3 install greenlet
+pip3 install gevent
+import requests
+import gevent
+from gevent import monkey
+#把当前的IO操作，打上标记，以便于gevent能检测出来实现异步(否则还是串行）
+monkey.patch_all()
+def task(url):
+  '''
+  1、request发起请求
+  :param url: 
+  :return: 
+  '''
+  response = requests.get(url)
+  print(response.status_code)
+gevent.joinall([
+  gevent.spawn(task,url='https://www.baidu.com'),
+  gevent.spawn(task,url='http://www.sina.com.cn'),
+  gevent.spawn(task,url='https://news.baidu.com'),
+])
+
+
+
+pip3 install grequests
+import grequests
+request_list = [
+  grequests.get('https://www.baidu.com'),
+  grequests.get('http://www.sina.com.cn'),
+  grequests.get('https://news.baidu.com'),
+]
+# ##### 执行并获取响应列表 #####
+response_list = grequests.map(request_list,size=5)
+print(response_list)
+
+#补充有关map的操作
+#lambda  匿名函数的操作
+lists = map(lambda x, y: x + y, [x for x in range(1,10)], [y for y in range(2,11)])
+for list in lists:
+    print(list)
+
+
+
+
+
+#关于封装了gevent request 的库
+import grequests
+import requests
+import cProfile#导入性能分析器
+
+urls = [
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030101.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030102.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030103.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030104.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030105.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030106.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030107.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030108.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030109.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030110.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030111.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030112.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030113.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030114.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030115.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030116.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030117.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030118.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030119.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030120.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030121.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030122.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030123.json',
+    'http://www.xiachufang.com/downloads/baidu_pip/2016030200.json',
+]
+def haha(urls):
+    rs = (grequests.get(u) for u in urls)
+    return grequests.map(rs)
+
+cProfile.run("haha(urls)")
+#结果
+2/1    0.000    0.000    0.132    0.132 coventry.py:651(haha)
+
+def hehe(urls):
+    hehe = [requests.get(i) for i in urls]
+    return hehe
+cProfile.run("hehe(urls)")
+#结果
+2/1    0.000    0.000    1.149    1.149 coventry.py:657(hehe)
+
+
+在io密集，等待io时间长的请求量级越大的情况，这样的性能提升越是明显，使用并发或者协程至少提升性能5倍以上我们越是应该使用异步或并行操作来减少io的等待时间。python比较有效和高效的处理方案我觉得非coroutines(协程)莫属了，而相关库最好用的又是gevent，所以非常值得深入研究下去，一探究竟。使用类似操作减少io等待，提升整个业务性能。
