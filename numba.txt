@@ -1,0 +1,20 @@
+让科学计算加速
+import time
+from numba import *
+def foo(x,y):
+        tt = time.time()
+        s = 0
+        for i in range(x,y):
+                s += i
+        return 'Time used: {} sec'.format(time.time() - tt)
+print(foo(1,100000000))
+
+@jit(int32(int32,int32))
+def foos(x,y):
+        tt = time.time()
+        s = 0
+        for i in range(x,y):
+                s += i
+        return 'Time used: {} sec'.format(time.time()-tt)
+
+print(foos(1,100000000))
